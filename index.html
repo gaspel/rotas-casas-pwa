@@ -1,0 +1,1910 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Rotas Casas de Aposta</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Leaflet CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+
+  <style>
+    :root {
+      --bg: #050814;
+      --bg-card: #0c1224;
+      --bg-card-soft: #131932;
+      --accent: #2dd4ff;
+      --accent-soft: rgba(45, 212, 255, 0.2);
+      --accent-strong: #38bdf8;
+      --danger: #f97373;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --border: #1f2933;
+      --radius-lg: 16px;
+      --radius-xl: 22px;
+      --shadow-soft: 0 18px 35px rgba(0, 0, 0, 0.55);
+      --shadow-glow: 0 0 22px rgba(56, 189, 248, 0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top, #020617 0, #020617 35%, #000 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 10px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 1100px;
+      background: linear-gradient(135deg, #020617 0, #020617 40%, #020617 100%);
+      border-radius: 24px;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      box-shadow: var(--shadow-soft);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 14px 18px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: radial-gradient(circle at left top, #0f172a 0, #020617 55%);
+    }
+
+    header .title {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.1rem;
+      letter-spacing: 0.02em;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    header h1 span.logo-pill {
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(56, 189, 248, 0.5);
+      background: radial-gradient(circle at top, #0ea5e9 0, #0369a1 55%, #020617 100%);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: white;
+      box-shadow: var(--shadow-glow);
+    }
+
+    header p {
+      margin: 0;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    header .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .pill-info {
+      font-size: 0.7rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      background: rgba(15, 23, 42, 0.75);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--muted);
+    }
+
+    .pill-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--accent);
+      border-radius: 999px;
+      box-shadow: 0 0 6px var(--accent);
+    }
+
+    .btn-small {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text);
+      padding: 5px 10px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-small.primary {
+      border-color: rgba(56, 189, 248, 0.7);
+      background: radial-gradient(circle at top, #0ea5e9 0, #0369a1 55%, #020617 100%);
+      color: white;
+      box-shadow: var(--shadow-glow);
+    }
+
+    main {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .card {
+      background: radial-gradient(circle at top left, #111827 0, #020617 65%);
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-soft);
+      padding: 12px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      gap: 8px;
+    }
+
+    .card-header h2 {
+      margin: 0;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .card-header h2 span.tag {
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      color: var(--muted);
+    }
+
+    .card-header small {
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+
+    .filters {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    @media (max-width: 800px) {
+      .filters {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 540px) {
+      .filters {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .field label {
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+
+    .field select,
+    .field input {
+      border-radius: 10px;
+      border: 1px solid rgba(55, 65, 81, 0.7);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text);
+      padding: 6px 8px;
+      font-size: 0.8rem;
+      outline: none;
+    }
+
+    .field input::placeholder {
+      color: rgba(148, 163, 184, 0.7);
+    }
+
+    .view-toggle {
+      display: inline-flex;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.85);
+      padding: 2px;
+      border: 1px solid rgba(30, 64, 175, 0.6);
+      box-shadow: 0 0 15px rgba(59, 130, 246, 0.25);
+    }
+
+    .view-toggle button {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+
+    .view-toggle button.active {
+      background: radial-gradient(
+        circle at top,
+        rgba(56, 189, 248, 0.2) 0,
+        rgba(37, 99, 235, 0.2) 40%,
+        transparent 100%
+      );
+      color: var(--accent-strong);
+      box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+    }
+
+    .summary-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+
+    .summary-pill {
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .summary-pill strong {
+      color: var(--accent-strong);
+    }
+
+    .summary-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    .list-container {
+      max-height: 360px;
+      overflow-y: auto;
+      border-radius: 14px;
+      background: radial-gradient(circle at top, #020617 0, #020617 70%);
+      border: 1px solid rgba(31, 41, 55, 0.95);
+      padding: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .shop-card {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 8px;
+      padding: 8px 9px;
+      border-radius: 12px;
+      background: radial-gradient(circle at left, #020617 0, #020617 80%);
+      border: 1px solid rgba(30, 64, 175, 0.6);
+      box-shadow: 0 10px 18px rgba(15, 23, 42, 0.9);
+      align-items: center;
+    }
+
+    .shop-card.selected {
+      border-color: rgba(56, 189, 248, 0.9);
+      box-shadow: var(--shadow-glow);
+      background: radial-gradient(circle at left, #0b1120 0, #020617 70%);
+    }
+
+    .shop-main {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .shop-name {
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .badge-chain {
+      font-size: 0.65rem;
+      padding: 1px 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      color: var(--muted);
+    }
+
+    .badge-chain.bingoal {
+      border-color: rgba(56, 189, 248, 0.6);
+      color: var(--accent-strong);
+    }
+
+    .badge-chain.golden {
+      border-color: rgba(251, 191, 36, 0.7);
+      color: #facc15;
+    }
+
+    .badge-chain.stanley {
+      border-color: rgba(74, 222, 128, 0.7);
+      color: #4ade80;
+    }
+
+    .badge-chain.circus {
+      border-color: rgba(248, 113, 113, 0.7);
+      color: #f97373;
+    }
+
+    .badge-chain.magic {
+      border-color: rgba(94, 234, 212, 0.7);
+      color: #5eead4;
+    }
+
+    .shop-address {
+      font-size: 0.73rem;
+      color: var(--muted);
+    }
+
+    .shop-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 3px;
+      font-size: 0.7rem;
+    }
+
+    .pill {
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--muted);
+    }
+
+    .pill span.value {
+      color: var(--accent-strong);
+      font-weight: 500;
+    }
+
+    .shop-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      font-size: 0.7rem;
+    }
+
+    .distance-label {
+      color: var(--accent-strong);
+      font-weight: 600;
+    }
+
+    .mini-text {
+      font-size: 0.65rem;
+      color: var(--muted);
+    }
+
+    .checkbox-select {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+
+    .checkbox-select input {
+      width: 14px;
+      height: 14px;
+    }
+
+    .btn-main {
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text);
+      padding: 7px 13px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn.primary {
+      border-color: rgba(56, 189, 248, 0.9);
+      background: linear-gradient(135deg, #0ea5e9, #0369a1);
+      color: white;
+      box-shadow: var(--shadow-glow);
+    }
+
+    .btn.secondary {
+      border-color: rgba(75, 85, 99, 0.9);
+      background: rgba(15, 23, 42, 0.95);
+    }
+
+    .btn.danger {
+      border-color: rgba(248, 113, 113, 0.8);
+      color: #fecaca;
+    }
+
+    #map-container {
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(30, 64, 175, 0.8);
+      box-shadow: var(--shadow-soft);
+      background: #020617;
+    }
+
+    #map {
+      width: 100%;
+      height: 360px;
+    }
+
+    #view-rota .rota-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .rota-header h2 {
+      margin: 0;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tag-live {
+      padding: 2px 6px;
+      border-radius: 999px;
+      font-size: 0.65rem;
+      background: rgba(34, 197, 94, 0.2);
+      border: 1px solid rgba(34, 197, 94, 0.7);
+      color: #bbf7d0;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .tag-live-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 8px #22c55e;
+    }
+
+    .rota-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .rota-list {
+      max-height: 360px;
+      overflow-y: auto;
+      border-radius: 14px;
+      background: radial-gradient(circle at top, #020617 0, #020617 70%);
+      border: 1px solid rgba(31, 41, 55, 0.95);
+      padding: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .rota-item {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 8px;
+      padding: 8px 9px;
+      border-radius: 12px;
+      background: radial-gradient(circle at left, #020617 0, #020617 80%);
+      border: 1px solid rgba(30, 64, 175, 0.6);
+      box-shadow: 0 10px 18px rgba(15, 23, 42, 0.9);
+      align-items: center;
+    }
+
+    .rota-step {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--accent-strong);
+    }
+
+    .rota-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      font-size: 0.7rem;
+    }
+
+    .badge-visited {
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: rgba(34, 197, 94, 0.2);
+      border: 1px solid rgba(34, 197, 94, 0.8);
+      color: #bbf7d0;
+    }
+
+    .footer-actions {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: space-between;
+    }
+
+    .footer-actions-left,
+    .footer-actions-right {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 40;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 360px;
+      background: radial-gradient(circle at top, #020617 0, #020617 80%);
+      border-radius: 18px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      box-shadow: var(--shadow-soft);
+      padding: 14px;
+    }
+
+    .modal h3 {
+      margin: 0 0 8px;
+      font-size: 0.9rem;
+    }
+
+    .modal p {
+      margin: 0 0 10px;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .modal input {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid rgba(55, 65, 81, 0.7);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text);
+      padding: 6px 8px;
+      font-size: 0.8rem;
+      margin-bottom: 10px;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 6px;
+    }
+
+    .leaflet-popup-content {
+      font-size: 0.75rem;
+    }
+    .leaflet-container {
+      background: #020617;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="title">
+        <h1>
+          <span class="logo-pill">Rotas Casas</span>
+          Planejador de visitas
+        </h1>
+        <p>Seleciona casas pelo filtro, lista ou mapa → gera a rota otimizada do dia.</p>
+      </div>
+      <div class="header-actions">
+        <div class="pill-info">
+          <span class="pill-dot"></span>
+          <span id="geo-status">Localização: detectando…</span>
+        </div>
+        <button class="btn-small primary" id="btn-ir-rota" disabled>
+          Rota atual
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section id="view-filtros" class="card">
+        <div class="card-header">
+          <div>
+            <h2>
+              Casas & filtros
+              <span class="tag">seleção</span>
+            </h2>
+            <small>Filtre por região, casa, máquinas. Selecione por lista ou mapa.</small>
+          </div>
+          <div class="view-toggle">
+            <button id="btn-view-lista" class="active">Lista</button>
+            <button id="btn-view-mapa">Mapa</button>
+          </div>
+        </div>
+
+        <div class="filters">
+          <div class="field">
+            <label for="f-regiao">Região</label>
+            <select id="f-regiao">
+              <option value="">Todas</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="f-cadeia">Casa</label>
+            <select id="f-cadeia">
+              <option value="">Todas</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="f-maquinas-min">Mínimo de máquinas</label>
+            <input
+              type="number"
+              id="f-maquinas-min"
+              min="0"
+              step="1"
+              placeholder="ex: 3"
+            />
+          </div>
+        </div>
+
+        <div class="summary-bar">
+          <div class="summary-pill">
+            <span class="summary-dot"></span>
+            <span>
+              <strong id="res-filtradas">0</strong> casas filtradas
+            </span>
+          </div>
+          <div class="summary-pill">
+            <span>Selecionadas:</span>
+            <strong id="res-selecionadas">0</strong>
+          </div>
+          <div class="summary-pill">
+            <span>Distância aprox. da rota:</span>
+            <strong id="res-distancia">0.0 km</strong>
+          </div>
+        </div>
+
+        <div id="lista-container" class="list-container"></div>
+
+        <div id="map-container" class="hidden">
+          <div id="map"></div>
+        </div>
+
+        <div class="btn-main">
+          <button class="btn secondary" id="btn-limpar-selecao">
+            Limpar seleção
+          </button>
+          <button class="btn primary" id="btn-criar-rota">
+            Criar rota otimizada
+          </button>
+        </div>
+      </section>
+
+      <section id="view-rota" class="card hidden">
+        <div class="rota-header">
+          <div>
+            <h2>
+              Rota do dia
+              <span class="tag-live">
+                <span class="tag-live-dot"></span>
+                ativa
+              </span>
+            </h2>
+            <small>Ordem automática a partir da sua localização.</small>
+          </div>
+<div style="margin:10px 0; display:flex; gap:10px;">
+  <button class="btn primary" onclick="gerarRotaSimples()">Rota simples (Google Maps)</button>
+  <button class="btn secondary" onclick="gerarRotaOtimizada()">Rota otimizada (Google Maps)</button>
+</div>
+
+          <button class="btn secondary" id="btn-voltar-filtros">
+            ← Voltar para filtros
+          </button>
+        </div>
+
+        <div class="rota-stats">
+          <div class="summary-pill">
+            Pendentes: <strong id="rota-pendentes">0</strong>
+          </div>
+          <div class="summary-pill">
+            Visitadas hoje: <strong id="rota-visitadas">0</strong>
+          </div>
+          <div class="summary-pill">
+            Distância total: <strong id="rota-dist-total">0.0 km</strong>
+          </div>
+        </div>
+
+        <div id="rota-lista" class="rota-list"></div>
+
+        <div class="footer-actions">
+          <div class="footer-actions-left">
+            <button class="btn secondary" id="btn-zerar-dia">
+              Zerar visitas do dia
+            </button>
+            <button class="btn secondary" id="btn-adicionar-mais">
+              + Adicionar casas à rota
+            </button>
+          </div>
+          <div class="footer-actions-right">
+            <button class="btn secondary" id="btn-imprimir-pdf">
+              Gerar PDF (impressão)
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  >
+
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const userLat=pos.coords.latitude;
+    const userLon=pos.coords.longitude;
+    const pts = selectedIds.map(id=>LOJAS.find(l=>l.id===id));
+    const way = pts.slice(0,-1).map(p=>`${p.lat},${p.lon}`).join('|');
+    const dest = pts[pts.length-1];
+    const url = `https://www.google.com/maps/dir/?api=1&origin=${userLat},${userLon}&destination=${dest.lat},${dest.lon}&waypoints=${way}`;
+    window.open(url,'_blank');
+  });
+}
+
+function haversine(a,b){
+  const R=6371;
+  const dLat=(b.lat-a.lat)*Math.PI/180;
+  const dLon=(b.lon-a.lon)*Math.PI/180;
+  const lat1=a.lat*Math.PI/180;
+  const lat2=b.lat*Math.PI/180;
+  const h=Math.sin(dLat/2)**2+Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLon/2)**2;
+  return 2*R*Math.asin(Math.sqrt(h));
+}
+
+function nearestNeighbor(points){
+  const n=points.length;
+  const visited=[0];
+  const unvisited=[...Array(n).keys()].slice(1);
+  while(unvisited.length){
+    const last=visited[visited.length-1];
+    let best=-1, bestD=1e9;
+    for(const i of unvisited){
+      const d=haversine(points[last], points[i]);
+      if(d<bestD){ bestD=d; best=i; }
+    }
+    visited.push(best);
+    unvisited.splice(unvisited.indexOf(best),1);
+  }
+  return visited;
+}
+
+
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const user={lat:pos.coords.latitude, lon:pos.coords.longitude};
+    const shops = selectedIds.map(id=>LOJAS.find(l=>l.id===id));
+    const pts=[user, ...shops];
+    const order=nearestNeighbor(pts);
+    const seq = order.slice(1); // remove user(0)
+    const finalPts = seq.map(i=>pts[i]);
+    const way = finalPts.slice(0,-1).map(p=>`${p.lat},${p.lon}`).join('|');
+    const dest = finalPts[finalPts.length-1];
+    const url=`https://www.google.com/maps/dir/?api=1&origin=${user.lat},${user.lon}&destination=${dest.lat},${dest.lon}&waypoints=${way}`;
+    window.open(url,'_blank');
+  });
+}
+
+
+function gerarRotaSimples() {
+  if (!rotaAtual.length) {
+    alert("Nenhuma rota criada!");
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(pos => {
+    const userLat = pos.coords.latitude;
+    const userLon = pos.coords.longitude;
+    const pts = rotaAtual.map(id => LOJAS.find(l => l.id === id)).filter(Boolean);
+    if (pts.length === 0) { alert("Rota vazia!"); return; }
+    const way = pts.slice(0, -1).map(p => `${p.lat},${p.lon}`).join("|");
+    const dest = pts[pts.length - 1];
+    const url = `https://www.google.com/maps/dir/?api=1&origin=${userLat},${userLon}&destination=${dest.lat},${dest.lon}&waypoints=${way}`;
+    window.open(url, "_blank");
+  });
+}
+
+function gerarRotaOtimizada() {
+  if (!rotaAtual.length) {
+    alert("Nenhuma rota criada!");
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(pos => {
+    const user = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+    const shops = rotaAtual.map(id => LOJAS.find(l => l.id === id)).filter(Boolean);
+    const pts = [user, ...shops];
+    const order = nearestNeighbor(pts);
+    const seq = order.slice(1);
+    const finalPts = seq.map(i => pts[i]);
+    const way = finalPts.slice(0, -1).map(p => `${p.lat},${p.lon}`).join("|");
+    const dest = finalPts[finalPts.length - 1];
+    const url = `https://www.google.com/maps/dir/?api=1&origin=${user.lat},${user.lon}&destination=${dest.lat},${dest.lon}&waypoints=${way}`;
+    window.open(url, "_blank");
+  });
+}
+
+</script>
+
+  <script>
+    // 👉 COLE AQUI O LINK CSV PUBLICADO DO SEU GOOGLE SHEETS
+    // Exemplo: "https://docs.google.com/spreadsheets/d/SEU_ID/export?format=csv"
+    const SHEET_JSON_URL = "https://script.google.com/macros/s/AKfycbzSd6xHLrDGPP1kq2FLeAeqZ4xYU4YxmUsmJKClPQA400cXwqFmExaA0RvWmHQ158_M/exec";
+
+    // Se quiser usar Geocoding / Distance Matrix no futuro:
+    const GOOGLE_API_KEY = "COLE_AQUI_SUA_GOOGLE_API_KEY";
+
+    let LOJAS = [];              // será carregado do Sheets
+    let userLocation = null;
+    let filteredShops = [];
+    let selectedIds = new Set();
+    let rotaAtual = [];
+    let visitasHoje = {};        // id -> estado de visita/aposta
+
+    let map = null;
+    let markersLayer = null;
+
+    // ======= Carregar dados do Google Sheets (CSV) =======
+
+    
+async function loadLojasFromSheet() {
+  try {
+    const resp = await fetch(SHEET_JSON_URL);
+    if (!resp.ok) throw new Error("Erro ao baixar JSON do Google Sheets");
+
+    const rows = await resp.json();
+
+    LOJAS = rows.map((r, index) => ({
+      id: "loja_" + index,
+      nome: r.nome_loja || "",
+      cadeia: r.casa || "",
+      regiao: r.regiao || "",
+      cidade: r.cidade || "",
+      endereco: r.endereco || "",
+      lat: parseFloat(r.latitude) || 0,
+      lon: parseFloat(r.longitude) || 0,
+      maquinas: parseInt(r.qtd_maquinas) || 0
+    }));
+
+    filteredShops = [...LOJAS];
+
+    buildRegioesOptions();
+    buildCadeiaOptions();
+    applyFilters();
+
+  } catch (e) {
+    console.error(e);
+    alert("Erro ao carregar dados. Verifique a API JSON.");
+  }
+}
+
+    
+
+    // ======= Utilidades =======
+
+    function haversineKm(lat1, lon1, lat2, lon2) {
+      const R = 6371;
+      const toRad = (x) => (x * Math.PI) / 180;
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(toRad(lat1)) *
+          Math.cos(toRad(lat2)) *
+          Math.sin(dLon / 2) *
+          Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
+
+    function formatKm(km) {
+      if (!isFinite(km)) return "-";
+      return km.toFixed(1).replace(".", ",");
+    }
+
+    function todayKey() {
+      const d = new Date();
+      return d.toISOString().slice(0, 10);
+    }
+
+    function getVisitInfo(id) {
+      if (!visitasHoje[id]) {
+        visitasHoje[id] = {
+          visitado: false,
+          apostaHoje: 0,
+          ultimaAposta: 0,
+          dataUltimaVisita: null,
+        };
+      }
+      return visitasHoje[id];
+    }
+
+    function cadeiaClass(cadeia) {
+      const c = (cadeia || "").toLowerCase();
+      if (c.includes("bingoal")) return "bingoal";
+      if (c.includes("golden")) return "golden";
+      if (c.includes("stanley")) return "stanley";
+      if (c.includes("circus")) return "circus";
+      if (c.includes("magic")) return "magic";
+      return "";
+    }
+
+    // ======= Geolocalização =======
+
+    function initGeolocation() {
+      const geoStatus = document.getElementById("geo-status");
+      if (!navigator.geolocation) {
+        geoStatus.textContent = "Localização: não suportada";
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          userLocation = {
+            lat: pos.coords.latitude,
+            lon: pos.coords.longitude,
+          };
+          geoStatus.textContent = "Localização: OK ✔";
+          updateAll();
+          if (map && userLocation) {
+            map.setView([userLocation.lat, userLocation.lon], 9);
+          }
+        },
+        (err) => {
+          console.warn("Erro geoloc:", err);
+          geoStatus.textContent = "Localização: permissão negada";
+          userLocation = null;
+          updateAll();
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 8000,
+        }
+      );
+    }
+
+    // ======= Filtros =======
+
+    function buildRegioesOptions() {
+      const fRegiao = document.getElementById("f-regiao");
+      // limpa antes
+      fRegiao.innerHTML = "<option value=''>Todas</option>";
+      const regioes = Array.from(new Set(LOJAS.map((l) => l.regiao).filter(Boolean))).sort();
+      regioes.forEach((r) => {
+        const opt = document.createElement("option");
+        opt.value = r;
+        opt.textContent = r;
+        fRegiao.appendChild(opt);
+      });
+    }
+
+    function buildCadeiaOptions() {
+      const fCadeia = document.getElementById("f-cadeia");
+      fCadeia.innerHTML = "<option value=''>Todas</option>";
+      const cadeias = Array.from(new Set(LOJAS.map((l) => l.cadeia).filter(Boolean))).sort();
+      cadeias.forEach((c) => {
+        const opt = document.createElement("option");
+        opt.value = c;
+        opt.textContent = c;
+        fCadeia.appendChild(opt);
+      });
+    }
+
+    function applyFilters() {
+      const regiao = document.getElementById("f-regiao").value;
+      const cadeia = document.getElementById("f-cadeia").value;
+      const maquinasMinStr = document.getElementById("f-maquinas-min").value;
+      const maquinasMin = maquinasMinStr ? parseInt(maquinasMinStr, 10) : 0;
+
+      filteredShops = LOJAS.filter((l) => {
+        if (regiao && l.regiao !== regiao) return false;
+        if (cadeia && l.cadeia !== cadeia) return false;
+        if (maquinasMin && (l.maquinas || 0) < maquinasMin) return false;
+        return true;
+      });
+
+      updateAll();
+    }
+
+    // ======= Lista =======
+
+    function renderLista() {
+      const container = document.getElementById("lista-container");
+      container.innerHTML = "";
+
+      filteredShops.forEach((shop) => {
+        const visit = getVisitInfo(shop.id);
+        const selected = selectedIds.has(shop.id);
+
+        let distKm = null;
+        if (userLocation) {
+          distKm = haversineKm(
+            userLocation.lat,
+            userLocation.lon,
+            shop.lat,
+            shop.lon
+          );
+        }
+
+        const card = document.createElement("div");
+        card.className = "shop-card" + (selected ? " selected" : "");
+
+        const colCheck = document.createElement("div");
+        colCheck.className = "checkbox-select";
+        const cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.checked = selected;
+        cb.addEventListener("change", () => {
+          toggleSelectShop(shop.id, cb.checked);
+        });
+        const cbLabel = document.createElement("span");
+        cbLabel.textContent = "Rota";
+        colCheck.appendChild(cb);
+        colCheck.appendChild(cbLabel);
+
+        const colMain = document.createElement("div");
+        colMain.className = "shop-main";
+
+        const nameRow = document.createElement("div");
+        nameRow.className = "shop-name";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = shop.nome;
+        const badge = document.createElement("span");
+        badge.className = "badge-chain " + cadeiaClass(shop.cadeia);
+        badge.textContent = shop.cadeia;
+        nameRow.appendChild(nameSpan);
+        nameRow.appendChild(badge);
+
+        const addr = document.createElement("div");
+        addr.className = "shop-address";
+        addr.textContent = shop.endereco || shop.cidade || "";
+
+        const meta = document.createElement("div");
+        meta.className = "shop-meta";
+
+        const pillRegiao = document.createElement("div");
+        pillRegiao.className = "pill";
+        pillRegiao.innerHTML =
+          "<span>Região</span> <span class='value'>" +
+          (shop.regiao || "-") +
+          "</span>";
+        meta.appendChild(pillRegiao);
+
+        const pillCidade = document.createElement("div");
+        pillCidade.className = "pill";
+        pillCidade.innerHTML =
+          "<span>Cidade</span> <span class='value'>" +
+          (shop.cidade || "-") +
+          "</span>";
+        meta.appendChild(pillCidade);
+
+        const pillMaquinas = document.createElement("div");
+        pillMaquinas.className = "pill";
+        pillMaquinas.innerHTML =
+          "<span>Máq.</span> <span class='value'>" +
+          (shop.maquinas ?? "-") +
+          "</span>";
+        meta.appendChild(pillMaquinas);
+
+        if (visit.ultimaAposta) {
+          const pillAposta = document.createElement("div");
+          pillAposta.className = "pill";
+          pillAposta.innerHTML =
+            "<span>Últ. aposta</span> <span class='value'>€ " +
+            visit.ultimaAposta.toFixed(2) +
+            "</span>";
+          meta.appendChild(pillAposta);
+        }
+
+        colMain.appendChild(nameRow);
+        colMain.appendChild(addr);
+        colMain.appendChild(meta);
+
+        const colActions = document.createElement("div");
+        colActions.className = "shop-actions";
+        const distLabel = document.createElement("div");
+        distLabel.className = "distance-label";
+        distLabel.textContent = userLocation
+          ? formatKm(distKm) + " km"
+          : "- km";
+        const mini = document.createElement("div");
+        mini.className = "mini-text";
+        mini.textContent = "distância da sua posição";
+
+        colActions.appendChild(distLabel);
+        colActions.appendChild(mini);
+
+        card.appendChild(colCheck);
+        card.appendChild(colMain);
+        card.appendChild(colActions);
+
+        card.addEventListener("click", (e) => {
+          if (e.target === cb) return;
+          cb.checked = !cb.checked;
+          toggleSelectShop(shop.id, cb.checked);
+        });
+
+        container.appendChild(card);
+      });
+    }
+
+    // ======= Mapa =======
+
+    function initMap() {
+      if (map) return;
+      map = L.map("map").setView([50.85, 4.35], 8);
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: "&copy; OpenStreetMap contributors",
+      }).addTo(map);
+
+      markersLayer = L.layerGroup().addTo(map);
+    }
+
+    function renderMap() {
+      initMap();
+      markersLayer.clearLayers();
+
+      const bounds = [];
+
+      filteredShops.forEach((shop) => {
+        const selected = selectedIds.has(shop.id);
+        let distKm = null;
+        if (userLocation) {
+          distKm = haversineKm(
+            userLocation.lat,
+            userLocation.lon,
+            shop.lat,
+            shop.lon
+          );
+        }
+
+        const marker = L.circleMarker([shop.lat, shop.lon], {
+          radius: 7,
+          color: selected ? "#22c55e" : "#38bdf8",
+          fillColor: selected ? "#22c55e" : "#0ea5e9",
+          fillOpacity: 0.9,
+          weight: 2,
+        });
+
+        const popupHtml = `
+          <strong>${shop.nome}</strong><br/>
+          <span style="color:#9ca3af">${shop.cadeia} · ${shop.cidade ?? ""}</span><br/>
+          <span style="color:#9ca3af; font-size:0.7rem">${shop.endereco ?? ""}</span><br/>
+          <span style="color:#38bdf8; font-size:0.7rem">
+            Distância: ${userLocation ? formatKm(distKm) + " km" : "-"}
+          </span><br/><br/>
+          <button id="popup-btn-${shop.id}" style="
+            padding:4px 8px;
+            border-radius:999px;
+            border:1px solid #38bdf8;
+            background:#020617;
+            color:#e5e7eb;
+            font-size:0.7rem;
+            cursor:pointer;
+          ">
+            ${selected ? "Remover da rota" : "Incluir na rota"}
+          </button>
+        `;
+
+        marker.bindPopup(popupHtml);
+
+        marker.on("popupopen", () => {
+          const btn = document.getElementById(`popup-btn-${shop.id}`);
+          if (btn) {
+            btn.addEventListener("click", () => {
+              const newSelected = !selectedIds.has(shop.id);
+              toggleSelectShop(shop.id, newSelected);
+              marker.closePopup();
+            });
+          }
+        });
+
+        markersLayer.addLayer(marker);
+        bounds.push([shop.lat, shop.lon]);
+      });
+
+      if (bounds.length > 0) {
+        map.fitBounds(bounds, { padding: [40, 40] });
+      } else if (userLocation) {
+        map.setView([userLocation.lat, userLocation.lon], 9);
+      }
+    }
+
+    function toggleView(mode) {
+      const listaCont = document.getElementById("lista-container");
+      const mapCont = document.getElementById("map-container");
+      const btnLista = document.getElementById("btn-view-lista");
+      const btnMapa = document.getElementById("btn-view-mapa");
+
+      if (mode === "lista") {
+        listaCont.classList.remove("hidden");
+        mapCont.classList.add("hidden");
+        btnLista.classList.add("active");
+        btnMapa.classList.remove("active");
+      } else {
+        listaCont.classList.add("hidden");
+        mapCont.classList.remove("hidden");
+        btnLista.classList.remove("active");
+        btnMapa.classList.add("active");
+        renderMap();
+      }
+    }
+
+    // ======= Seleção / rota =======
+
+    function toggleSelectShop(id, selected) {
+      if (selected) {
+        selectedIds.add(id);
+      } else {
+        selectedIds.delete(id);
+      }
+      updateAll();
+    }
+
+    function calcularDistanciaAproximadaSelecionadas() {
+      if (!userLocation || selectedIds.size === 0) return 0;
+
+      const points = Array.from(selectedIds)
+        .map((id) => LOJAS.find((l) => l.id === id))
+        .filter(Boolean);
+
+      let total = 0;
+      let current = { lat: userLocation.lat, lon: userLocation.lon };
+      const remaining = [...points];
+
+      while (remaining.length > 0) {
+        let bestIndex = 0;
+        let bestDist = Infinity;
+        for (let i = 0; i < remaining.length; i++) {
+          const s = remaining[i];
+          const d = haversineKm(current.lat, current.lon, s.lat, s.lon);
+          if (d < bestDist) {
+            bestDist = d;
+            bestIndex = i;
+          }
+        }
+        total += bestDist;
+        current = {
+          lat: remaining[bestIndex].lat,
+          lon: remaining[bestIndex].lon,
+        };
+        remaining.splice(bestIndex, 1);
+      }
+
+      return total;
+    }
+
+    function updateSummary() {
+      document.getElementById("res-filtradas").textContent =
+        filteredShops.length;
+      document.getElementById("res-selecionadas").textContent =
+        selectedIds.size;
+      const dist = calcularDistanciaAproximadaSelecionadas();
+      document.getElementById("res-distancia").textContent =
+        formatKm(dist) + " km";
+
+      const btnIrRota = document.getElementById("btn-ir-rota");
+      btnIrRota.disabled = rotaAtual.length === 0;
+    }
+
+    function updateAll() {
+      renderLista();
+      if (!document.getElementById("map-container").classList.contains("hidden")) {
+        renderMap();
+      }
+      updateSummary();
+      renderRotaView();
+    }
+
+    function criarRota() {
+      if (selectedIds.size === 0) {
+        alert("Selecione pelo menos uma casa para criar a rota.");
+        return;
+      }
+      if (!userLocation) {
+        const ok = confirm(
+          "A localização não está disponível. Criar rota mesmo assim (ordem aproximada)?"
+        );
+        if (!ok) return;
+      }
+
+      const shopsSelecionadas = Array.from(selectedIds)
+        .map((id) => LOJAS.find((l) => l.id === id))
+        .filter(Boolean);
+
+      let ordem = [];
+
+      if (!userLocation) {
+        ordem = shopsSelecionadas
+          .slice()
+          .sort((a, b) =>
+            (a.regiao + a.cidade + a.nome).localeCompare(
+              b.regiao + b.cidade + b.nome
+            )
+          )
+          .map((s) => s.id);
+      } else {
+        const remaining = [...shopsSelecionadas];
+        let current = { lat: userLocation.lat, lon: userLocation.lon };
+        while (remaining.length > 0) {
+          let bestIndex = 0;
+          let bestDist = Infinity;
+          for (let i = 0; i < remaining.length; i++) {
+            const s = remaining[i];
+            const d = haversineKm(current.lat, current.lon, s.lat, s.lon);
+            if (d < bestDist) {
+              bestDist = d;
+              bestIndex = i;
+            }
+          }
+          const chosen = remaining.splice(bestIndex, 1)[0];
+          ordem.push(chosen.id);
+          current = { lat: chosen.lat, lon: chosen.lon };
+        }
+      }
+
+      rotaAtual = ordem;
+      rotaAtual.forEach((id) => {
+        const info = getVisitInfo(id);
+        info.apostaHoje = 0;
+        info.visitado = false;
+      });
+
+      mostrarRotaView();
+    }
+
+    function calcularDistanciaRota() {
+      if (rotaAtual.length === 0) return 0;
+      let total = 0;
+
+      let prevLat, prevLon;
+      if (userLocation) {
+        prevLat = userLocation.lat;
+        prevLon = userLocation.lon;
+      } else {
+        const firstShop = LOJAS.find((l) => l.id === rotaAtual[0]);
+        prevLat = firstShop.lat;
+        prevLon = firstShop.lon;
+      }
+
+      rotaAtual.forEach((id) => {
+        const shop = LOJAS.find((l) => l.id === id);
+        if (!shop) return;
+        const d = haversineKm(prevLat, prevLon, shop.lat, shop.lon);
+        total += d;
+        prevLat = shop.lat;
+        prevLon = shop.lon;
+      });
+
+      return total;
+    }
+
+    function mostrarRotaView() {
+      document.getElementById("view-filtros").classList.add("hidden");
+      document.getElementById("view-rota").classList.remove("hidden");
+      document.getElementById("btn-ir-rota").disabled = false;
+      renderRotaView();
+    }
+
+    function mostrarFiltrosView() {
+      document.getElementById("view-rota").classList.add("hidden");
+      document.getElementById("view-filtros").classList.remove("hidden");
+    }
+
+    function renderRotaView() {
+      const container = document.getElementById("rota-lista");
+      if (!container) return;
+
+      container.innerHTML = "";
+      let pendentes = 0;
+      let visitadas = 0;
+
+      rotaAtual.forEach((id, idx) => {
+        const shop = LOJAS.find((l) => l.id === id);
+        if (!shop) return;
+        const info = getVisitInfo(id);
+
+        if (info.visitado) visitadas++;
+        else pendentes++;
+
+        const item = document.createElement("div");
+        item.className = "rota-item";
+
+        const colStep = document.createElement("div");
+        colStep.className = "rota-step";
+        colStep.textContent = idx + 1;
+
+        const colMain = document.createElement("div");
+        colMain.className = "shop-main";
+
+        const nameRow = document.createElement("div");
+        nameRow.className = "shop-name";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = shop.nome;
+        const badge = document.createElement("span");
+        badge.className = "badge-chain " + cadeiaClass(shop.cadeia);
+        badge.textContent = shop.cadeia;
+        nameRow.appendChild(nameSpan);
+        nameRow.appendChild(badge);
+
+        const addr = document.createElement("div");
+        addr.className = "shop-address";
+        addr.textContent = shop.endereco || shop.cidade || "";
+
+        const meta = document.createElement("div");
+        meta.className = "shop-meta";
+
+        const pillCidade = document.createElement("div");
+        pillCidade.className = "pill";
+        pillCidade.innerHTML =
+          "<span>Cidade</span> <span class='value'>" +
+          (shop.cidade || "-") +
+          "</span>";
+        meta.appendChild(pillCidade);
+
+        const pillMaquinas = document.createElement("div");
+        pillMaquinas.className = "pill";
+        pillMaquinas.innerHTML =
+          "<span>Máq.</span> <span class='value'>" +
+          (shop.maquinas ?? "-") +
+          "</span>";
+        meta.appendChild(pillMaquinas);
+
+        if (info.ultimaAposta) {
+          const pillUlt = document.createElement("div");
+          pillUlt.className = "pill";
+          pillUlt.innerHTML =
+            "<span>Últ. aposta</span> <span class='value'>€ " +
+            info.ultimaAposta.toFixed(2) +
+            "</span>";
+          meta.appendChild(pillUlt);
+        }
+
+        colMain.appendChild(nameRow);
+        colMain.appendChild(addr);
+        colMain.appendChild(meta);
+
+        const colActions = document.createElement("div");
+        colActions.className = "rota-actions";
+
+        let distKm = null;
+        if (userLocation || idx > 0) {
+          let prevLat, prevLon;
+          if (idx === 0 && userLocation) {
+            prevLat = userLocation.lat;
+            prevLon = userLocation.lon;
+          } else if (idx > 0) {
+            const prevShop = LOJAS.find((l) => l.id === rotaAtual[idx - 1]);
+            prevLat = prevShop.lat;
+            prevLon = prevShop.lon;
+          }
+          if (prevLat != null) {
+            distKm = haversineKm(prevLat, prevLon, shop.lat, shop.lon);
+          }
+        }
+        const distLabel = document.createElement("div");
+        distLabel.className = "distance-label";
+        distLabel.textContent = distKm ? formatKm(distKm) + " km" : "- km";
+        colActions.appendChild(distLabel);
+
+        const mini = document.createElement("div");
+        mini.className = "mini-text";
+        mini.textContent =
+          idx === 0
+            ? "a partir da sua posição"
+            : "a partir do ponto anterior";
+        colActions.appendChild(mini);
+
+        const btnRow = document.createElement("div");
+        btnRow.style.display = "flex";
+        btnRow.style.gap = "4px";
+
+        const btnVisitada = document.createElement("button");
+        btnVisitada.className = "btn primary";
+        btnVisitada.style.padding = "3px 8px";
+        btnVisitada.style.fontSize = "0.7rem";
+        btnVisitada.textContent = info.visitado ? "Visitada" : "Marcar visita";
+        btnVisitada.disabled = info.visitado;
+        btnVisitada.addEventListener("click", () => {
+          marcarVisitadaComAposta(shop.id);
+        });
+
+        const btnRemoverRota = document.createElement("button");
+        btnRemoverRota.className = "btn secondary";
+        btnRemoverRota.style.padding = "3px 8px";
+        btnRemoverRota.style.fontSize = "0.7rem";
+        btnRemoverRota.textContent = "Remover da rota";
+        btnRemoverRota.addEventListener("click", () => {
+          rotaAtual = rotaAtual.filter((x) => x !== shop.id);
+          selectedIds.delete(shop.id);
+          updateAll();
+        });
+
+        btnRow.appendChild(btnVisitada);
+        btnRow.appendChild(btnRemoverRota);
+
+        colActions.appendChild(btnRow);
+
+        const btnsNavegacao = document.createElement("div");
+        btnsNavegacao.style.display = "flex";
+        btnsNavegacao.style.gap = "4px";
+        btnsNavegacao.style.marginTop = "4px";
+
+        const btnMaps = document.createElement("button");
+        btnMaps.className = "btn-small";
+        btnMaps.style.fontSize = "0.65rem";
+        btnMaps.textContent = "Maps";
+        btnMaps.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const url =
+            "https://www.google.com/maps/dir/?api=1&destination=" +
+            encodeURIComponent(shop.lat + "," + shop.lon);
+          window.open(url, "_blank");
+        });
+
+        const btnWaze = document.createElement("button");
+        btnWaze.className = "btn-small";
+        btnWaze.style.fontSize = "0.65rem";
+        btnWaze.textContent = "Waze";
+        btnWaze.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const url =
+            "https://waze.com/ul?ll=" +
+            encodeURIComponent(shop.lat + "," + shop.lon) +
+            "&navigate=yes";
+          window.open(url, "_blank");
+        });
+
+        btnsNavegacao.appendChild(btnMaps);
+        btnsNavegacao.appendChild(btnWaze);
+        colActions.appendChild(btnsNavegacao);
+
+        if (info.visitado) {
+          const badgeV = document.createElement("div");
+          badgeV.className = "badge-visited";
+          badgeV.textContent = "Visitada hoje";
+          colActions.appendChild(badgeV);
+        }
+
+        item.appendChild(colStep);
+        item.appendChild(colMain);
+        item.appendChild(colActions);
+
+        container.appendChild(item);
+      });
+
+      document.getElementById("rota-pendentes").textContent = pendentes;
+      document.getElementById("rota-visitadas").textContent = visitadas;
+      document.getElementById("rota-dist-total").textContent =
+        formatKm(calcularDistanciaRota()) + " km";
+    }
+
+    // ======= Marcar visitada + aposta =======
+
+    function marcarVisitadaComAposta(id) {
+      const shop = LOJAS.find((l) => l.id === id);
+      if (!shop) return;
+
+      const backdrop = document.createElement("div");
+      backdrop.className = "modal-backdrop";
+
+      const modal = document.createElement("div");
+      modal.className = "modal";
+
+      const h3 = document.createElement("h3");
+      h3.textContent = "Registrar visita e aposta";
+      const p = document.createElement("p");
+      p.textContent =
+        'Você visitou "' +
+        shop.nome +
+        '". Deseja registrar o valor apostado agora?';
+
+      const input = document.createElement("input");
+      input.type = "number";
+      input.step = "0.01";
+      input.min = "0";
+      input.placeholder = "Valor da aposta em € (opcional)";
+
+      const actions = document.createElement("div");
+      actions.className = "modal-actions";
+
+      const btnCancelar = document.createElement("button");
+      btnCancelar.className = "btn secondary";
+      btnCancelar.style.fontSize = "0.75rem";
+      btnCancelar.textContent = "Cancelar";
+      btnCancelar.addEventListener("click", () => {
+        document.body.removeChild(backdrop);
+      });
+
+      const btnOk = document.createElement("button");
+      btnOk.className = "btn primary";
+      btnOk.style.fontSize = "0.75rem";
+      btnOk.textContent = "Salvar";
+      btnOk.addEventListener("click", () => {
+        const valorStr = input.value.trim();
+        const info = getVisitInfo(id);
+        info.visitado = true;
+        info.dataUltimaVisita = todayKey();
+
+        if (valorStr) {
+          const valor = parseFloat(valorStr.replace(",", "."));
+          if (!isNaN(valor)) {
+            info.apostaHoje = valor;
+            info.ultimaAposta = valor;
+          }
+        }
+
+        rotaAtual = rotaAtual.filter((x) => x !== id);
+
+        document.body.removeChild(backdrop);
+        updateAll();
+      });
+
+      actions.appendChild(btnCancelar);
+      actions.appendChild(btnOk);
+
+      modal.appendChild(h3);
+      modal.appendChild(p);
+      modal.appendChild(input);
+      modal.appendChild(actions);
+
+      backdrop.appendChild(modal);
+      document.body.appendChild(backdrop);
+      input.focus();
+    }
+
+    // ======= Zerar visitas =======
+
+    function zerarVisitasDia() {
+      if (!confirm("Zerar todas as visitas e apostas de hoje?")) return;
+      Object.keys(visitasHoje).forEach((id) => {
+        visitasHoje[id].visitado = false;
+        visitasHoje[id].apostaHoje = 0;
+      });
+      updateAll();
+    }
+
+    // ======= Eventos =======
+
+    function initEvents() {
+      document
+        .getElementById("f-regiao")
+        .addEventListener("change", applyFilters);
+      document
+        .getElementById("f-cadeia")
+        .addEventListener("change", applyFilters);
+      document
+        .getElementById("f-maquinas-min")
+        .addEventListener("input", applyFilters);
+
+      document
+        .getElementById("btn-view-lista")
+        .addEventListener("click", () => toggleView("lista"));
+      document
+        .getElementById("btn-view-mapa")
+        .addEventListener("click", () => toggleView("mapa"));
+
+      document
+        .getElementById("btn-limpar-selecao")
+        .addEventListener("click", () => {
+          selectedIds.clear();
+          updateAll();
+        });
+
+      document
+        .getElementById("btn-criar-rota")
+        .addEventListener("click", criarRota);
+
+      document
+        .getElementById("btn-voltar-filtros")
+        .addEventListener("click", mostrarFiltrosView);
+
+      document.getElementById("btn-ir-rota").addEventListener("click", () => {
+        if (rotaAtual.length === 0) {
+          alert("Nenhuma rota criada ainda.");
+          return;
+        }
+        mostrarRotaView();
+      });
+
+      document
+        .getElementById("btn-zerar-dia")
+        .addEventListener("click", zerarVisitasDia);
+
+      document
+        .getElementById("btn-adicionar-mais")
+        .addEventListener("click", () => {
+          mostrarFiltrosView();
+          alert(
+            "Use os filtros e marque novas casas. Depois clique novamente em 'Criar rota'."
+          );
+        });
+
+      document
+        .getElementById("btn-imprimir-pdf")
+        .addEventListener("click", () => {
+          window.print();
+        });
+    }
+
+    // ======= Init =======
+
+    function init() {
+      initEvents();
+      initGeolocation();
+      loadLojasFromSheet();
+    }
+
+    window.addEventListener("load", init);
+  
+
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const userLat=pos.coords.latitude;
+    const userLon=pos.coords.longitude;
+    const pts = selectedIds.map(id=>LOJAS.find(l=>l.id===id));
+    const way = pts.slice(0,-1).map(p=>`${p.lat},${p.lon}`).join('|');
+    const dest = pts[pts.length-1];
+    const url = `https://www.google.com/maps/dir/?api=1&origin=${userLat},${userLon}&destination=${dest.lat},${dest.lon}&waypoints=${way}`;
+    window.open(url,'_blank');
+  });
+
+
+function haversine(a,b){
+  const R=6371;
+  const dLat=(b.lat-a.lat)*Math.PI/180;
+  const dLon=(b.lon-a.lon)*Math.PI/180;
+  const lat1=a.lat*Math.PI/180;
+  const lat2=b.lat*Math.PI/180;
+  const h=Math.sin(dLat/2)**2+Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLon/2)**2;
+  return 2*R*Math.asin(Math.sqrt(h));
+}
+
+function nearestNeighbor(points){
+  const n=points.length;
+  const visited=[0];
+  const unvisited=[...Array(n).keys()].slice(1);
+  while(unvisited.length){
+    const last=visited[visited.length-1];
+    let best=-1, bestD=1e9;
+    for(const i of unvisited){
+      const d=haversine(points[last], points[i]);
+      if(d<bestD){ bestD=d; best=i; }
+    }
+    visited.push(best);
+    unvisited.splice(unvisited.indexOf(best),1);
+  }
+  return visited;
+}
+
+
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const user={lat:pos.coords.latitude, lon:pos.coords.longitude};
+    const shops = selectedIds.map(id=>LOJAS.find(l=>l.id===id));
+    const pts=[user, ...shops];
+    const order=nearestNeighbor(pts);
+    const seq = order.slice(1); // remove user(0)
+    const finalPts = seq.map(i=>pts[i]);
+    const way = finalPts.slice(0,-1).map(p=>`${p.lat},${p.lon}`).join('|');
+    const dest = finalPts[finalPts.length-1];
+    const url=`https://www.google.com/maps/dir/?api=1&origin=${user.lat},${user.lon}&destination=${dest.lat},${dest.lon}&waypoints=${way}`;
+    window.open(url,'_blank');
+  });
+
+
+
+function gerarRotaSimples() {
+  if (!rotaAtual.length) {
+    alert("Nenhuma rota criada!");
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(pos => {
+    const userLat = pos.coords.latitude;
+    const userLon = pos.coords.longitude;
+    const pts = rotaAtual.map(id => LOJAS.find(l => l.id === id)).filter(Boolean);
+    if (pts.length === 0) { alert("Rota vazia!"); return; }
+    const way = pts.slice(0, -1).map(p => `${p.lat},${p.lon}`).join("|");
+    const dest = pts[pts.length - 1];
+    const url = `https://www.google.com/maps/dir/?api=1&origin=${userLat},${userLon}&destination=${dest.lat},${dest.lon}&waypoints=${way}`;
+    window.open(url, "_blank");
+  });
+}
+
+function gerarRotaOtimizada() {
+  if (!rotaAtual.length) {
+    alert("Nenhuma rota criada!");
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(pos => {
+    const user = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+    const shops = rotaAtual.map(id => LOJAS.find(l => l.id === id)).filter(Boolean);
+    const pts = [user, ...shops];
+    const order = nearestNeighbor(pts);
+    const seq = order.slice(1);
+    const finalPts = seq.map(i => pts[i]);
+    const way = finalPts.slice(0, -1).map(p => `${p.lat},${p.lon}`).join("|");
+    const dest = finalPts[finalPts.length - 1];
+    const url = `https://www.google.com/maps/dir/?api=1&origin=${user.lat},${user.lon}&destination=${dest.lat},${dest.lon}&waypoints=${way}`;
+    window.open(url, "_blank");
+  });
+}
+
+</script>
+</body>
+</html>
