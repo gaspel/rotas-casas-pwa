@@ -1,8 +1,0 @@
-[{
-      "relation": ["delegate_permission/common.handle_all_urls"],
-      "target": {
-        "namespace": "android_app",
-        "package_name": "io.github.gaspel.twa",
-        "sha256_cert_fingerprints": ["27:EE:FF:A7:2A:6E:49:E5:7B:EB:34:42:E5:BA:C2:B0:75:EA:99:73:86:72:EE:AD:A9:CC:91:3D:4F:B9:86:09"]
-      }
-    }]
