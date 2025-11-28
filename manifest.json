@@ -1,22 +1,21 @@
 {
-  "name": "Rotas Casas de Aposta",
-  "short_name": "Rotas Casas",
+  "name": "Rotas Casas",
+  "short_name": "Rotas",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#020617",
-  "theme_color": "#0ea5e9",
-  "description": "Planejador de visitas com rotas otimizadas.",
+  "background_color": "#000000",
+  "theme_color": "#00eaff",
   "icons": [
     {
       "src": "icons/icon-192.png",
-      "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192",
+      "type": "image/png"
     },
     {
       "src": "icons/icon-512.png",
-      "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "type": "image/png"
     }
   ]
 }
