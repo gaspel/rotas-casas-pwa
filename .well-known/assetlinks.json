@@ -1,8 +1,12 @@
-[{
-      "relation": ["delegate_permission/common.handle_all_urls"],
-      "target": {
-        "namespace": "android_app",
-        "package_name": "io.github.gaspel.twa",
-        "sha256_cert_fingerprints": ["27:EE:FF:A7:2A:6E:49:E5:7B:EB:34:42:E5:BA:C2:B0:75:EA:99:73:86:72:EE:AD:A9:CC:91:3D:4F:B9:86:09"]
-      }
-    }]
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "io.github.gaspel.twa",
+      "sha256_cert_fingerprints": [
+        "B8:1A:5D:3B:32:AB:E6:64:0F:55:7F:61:63:16:9C:01:17:89:61:3C:AB:CE:70:74:80:84:7F:3A:5E:AB:7D:30"
+      ]
+    }
+  }
+]
